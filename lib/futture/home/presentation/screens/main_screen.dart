@@ -1,7 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:grocery_app_with_baya/futture/home/domein/useCase/get_products_use_case.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+
+import '../../data/data_sourse/product_data_sourse.dart';
+import '../../data/repositories/product_repositories_impl.dart';
+import '../../domein/entities/product_entity.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -15,9 +20,18 @@ class _MainScreenState extends State<MainScreen> {
   int _currentPage = 0;
   late Timer _timer;
 
+  late final GetProductsUseCase _getProductsUseCase;
+  late List<ProductEntity> _products = [];
+
+  bool _isLike = false;
+
   @override
   void initState() {
     super.initState();
+
+    _getProductsUseCase = GetProductsUseCase(
+        ProductRepositoriesImpl(ProductLocalDataSource()));
+    getProducts();
 
     // Запускаем таймер для автоматической прокрутки
     _timer =
@@ -41,6 +55,13 @@ class _MainScreenState extends State<MainScreen> {
     _timer.cancel(); // Останавливаем таймер при удалении виджета
     _pageController.dispose();
     super.dispose();
+  }
+
+  Future<void> getProducts() async {
+    final products = await _getProductsUseCase();
+    setState(() {
+      _products = products;
+    });
   }
 
   @override
@@ -79,6 +100,25 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ),
             const SizedBox(height: 16),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _products.length,
+                itemBuilder: (context, index) {
+                  final product = _products[index];
+                  return ListTile(
+                    title: Text(product.name),
+                    subtitle: Text(product.price.toString()),
+                    trailing: IconButton(
+                      onPressed: () {},
+                      icon: product.isLike
+                          ? const Icon(Icons.favorite,
+                              color: Colors.red)
+                          : const Icon(Icons.favorite_border),
+                    ),
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),

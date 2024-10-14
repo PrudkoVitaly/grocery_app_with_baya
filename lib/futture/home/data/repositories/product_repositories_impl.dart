@@ -1,52 +1,15 @@
-import 'package:grocery_app_with_baya/futture/home/data/model/category_model.dart';
+import 'package:grocery_app_with_baya/futture/home/data/data_sourse/product_data_sourse.dart';
 
-import '../../domein/repositories/get_product_by_categories.dart';
-import '../data_sourse/category_data_source.dart';
+import '../../domein/entities/product_entity.dart';
+import '../../domein/repositories/product_repositories.dart';
 
-class ProductRepositoriesImpl implements GetProductByCategories {
-  final List<CategoryModel> _categories = [
-    CategoryModel(
-      name: "Fruits",
-      image: "assets/fruits.png",
-      category: "fruits",
-      weight: 1.0,
-      price: 1.0,
-      isFavorite: false,
-      discount: 0.0,
-    ),
-    CategoryModel(
-      name: "Vegetables",
-      image: "assets/vegetables.png",
-      category: "vegetables",
-      weight: 1.0,
-      price: 1.0,
-      isFavorite: false,
-      discount: 0.0,
-    ),
-    CategoryModel(
-      name: "Dairy",
-      image: "assets/dairy.png",
-      category: "dairy",
-      weight: 1.0,
-      price: 1.0,
-      isFavorite: false,
-      discount: 0.0,
-    ),
-    CategoryModel(
-      name: "Meat",
-      image: "assets/meat.png",
-      category: "meat",
-      weight: 1.0,
-      price: 1.0,
-      isFavorite: false,
-      discount: 0.0,
-    ),
-  ];
+// Класс  отвечает за логику работы с продуктами
+class ProductRepositoriesImpl implements ProductRepositories {
+  final ProductDataSource _productDataSource;
+  ProductRepositoriesImpl(this._productDataSource);
 
-  Future<List<CategoryModel>> getProductByCategories(
-      String category) async {
-    return _categories
-        .where((product) => product.category == category)
-        .toList();
+  @override
+  Future<List<ProductEntity>> getProducts() async {
+    return await _productDataSource.getProductFromDB();
   }
 }
